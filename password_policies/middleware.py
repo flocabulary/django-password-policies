@@ -8,8 +8,7 @@ from django.utils import timezone
 
 from password_policies.conf import settings
 from password_policies.models import PasswordChangeRequired, PasswordHistory
-from password_policies.utils import PasswordCheck
-
+from password_policies.utils import datetime_to_timestamp
 
 class PasswordChangeMiddleware(object):
     """
@@ -47,21 +46,19 @@ To use this middleware you need to add it to the
     protocol.
 """
 
-    checked = '_password_policies_last_checked'
-    expired = '_password_policies_expired'
-    last = '_password_policies_last_changed'
-    required = '_password_policies_change_required'
-    td = timedelta(seconds=settings.PASSWORD_DURATION_SECONDS)
+    checked = '_password_policies_last_checked' # timestamp of last time the session was checked
+    last = '_password_policies_last_changed' # timestamp of the last time the password was changed
+    required = '_password_policies_change_required' # boolean  of whether a password change is required
 
     def _check_history(self, request):
         if not request.session.get(self.last, None):
             newest = PasswordHistory.objects.get_newest(request.user)
             if newest:
-                request.session[self.last] = newest.created
+                request.session[self.last] = datetime_to_timestamp(newest.created)
             else:
                 # TODO: This relies on request.user.date_joined which might not
                 # be available!!!
-                request.session[self.last] = request.user.date_joined
+                request.session[self.last] = datetime_to_timestamp(request.user.date_joined)
         if request.session[self.last] < self.expiry_datetime:
             request.session[self.required] = True
             if not PasswordChangeRequired.objects.filter(user=request.user).count():
@@ -87,7 +84,6 @@ To use this middleware you need to add it to the
                     del request.session[self.last]
                     del request.session[self.checked]
                     del request.session[self.required]
-                    del request.session[self.expired]
                 except KeyError:
                     pass
             if settings.PASSWORD_USE_HISTORY:
@@ -143,12 +139,11 @@ To use this middleware you need to add it to the
             resolve(request.path)
         except Resolver404:
             return
-        self.now = timezone.now()
+        self.now = datetime_to_timestamp(timezone.now())
         self.url = reverse('password_change')
         if settings.PASSWORD_DURATION_SECONDS and \
                 request.user.is_authenticated() and \
                 not self._is_excluded_path(request.path):
-            self.check = PasswordCheck(request.user)
-            self.expiry_datetime = self.check.get_expiry_datetime()
+            self.expiry_datetime = self.now - int(settings.PASSWORD_DURATION_SECONDS)
             self._check_necessary(request)
             return self._redirect(request)

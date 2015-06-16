@@ -18,6 +18,7 @@ from password_policies.conf import settings
 from password_policies.forms import PasswordPoliciesForm
 from password_policies.forms import PasswordPoliciesChangeForm
 from password_policies.forms import PasswordResetForm
+from password_policies.utils import datetime_to_timestamp
 
 
 class LoggedOutMixin(View):
@@ -92,7 +93,7 @@ if set, otherwise the URL to the :class:`PasswordChangeDoneView`.
         checked = '_password_policies_last_checked'
         last = '_password_policies_last_changed'
         required = '_password_policies_change_required'
-        now = timezone.now()
+        now = datetime_to_timestamp(timezone.now())
         self.request.session[checked] = now
         self.request.session[last] = now
         self.request.session[required] = False
