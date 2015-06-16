@@ -109,8 +109,8 @@ if set, otherwise the URL to the :class:`PasswordChangeDoneView`.
     def get_context_data(self, **kwargs):
         name = self.redirect_field_name
         kwargs[name] = self.request.REQUEST.get(name, '')
+        kwargs['password_change_required'] = self.request.session.get(settings.PASSWORD_SESSION_REQUIRED_KEY, False)
         return super(PasswordChangeFormView, self).get_context_data(**kwargs)
-
 
 class PasswordResetCompleteView(LoggedOutMixin, TemplateView):
     """
