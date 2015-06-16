@@ -46,9 +46,9 @@ To use this middleware you need to add it to the
     protocol.
 """
 
-    checked = '_password_policies_last_checked' # timestamp of last time the session was checked
-    last = '_password_policies_last_changed' # timestamp of the last time the password was changed
-    required = '_password_policies_change_required' # boolean  of whether a password change is required
+    checked = settings.PASSWORD_SESSION_LAST_CHECKED_KEY
+    last = settings.PASSWORD_SESSION_LAST_CHANGED_KEY
+    required = settings.PASSWORD_SESSION_REQUIRED_KEY
 
     def _check_history(self, request):
         if not request.session.get(self.last, None):

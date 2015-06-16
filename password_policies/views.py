@@ -90,9 +90,9 @@ user was requesting before the password change.)
 If not returns the :attr:`~PasswordChangeFormView.success_url` attribute
 if set, otherwise the URL to the :class:`PasswordChangeDoneView`.
 """
-        checked = '_password_policies_last_checked'
-        last = '_password_policies_last_changed'
-        required = '_password_policies_change_required'
+        checked = settings.PASSWORD_SESSION_LAST_CHECKED_KEY
+        last = settings.PASSWORD_SESSION_LAST_CHANGED_KEY
+        required = settings.PASSWORD_SESSION_REQUIRED_KEY
         now = datetime_to_timestamp(timezone.now())
         self.request.session[checked] = now
         self.request.session[last] = now

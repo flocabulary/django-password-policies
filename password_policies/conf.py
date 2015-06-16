@@ -150,4 +150,11 @@ Used by the :validator:`DictionaryValidator`.
     #: in the root of the template directory.
     TEMPLATE_403_PAGE = '403.html'
 
+    #: The session key for the variable that records the last time a user's password was checked
+    PASSWORD_SESSION_LAST_CHECKED_KEY = '_password_policies_last_checked'
+    #: The session key for the variable that records the last time a user's password was changed
+    PASSWORD_SESSION_LAST_CHANGED_KEY = '_password_policies_last_changed'
+    #: The session key for the variable that records whether the password needs to be changed
+    PASSWORD_SESSION_REQUIRED_KEY = '_password_policies_change_required'
+
 settings = Settings()
