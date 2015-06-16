@@ -7,6 +7,20 @@ class Settings(AppSettings):
     """
 Default settings for django-password-policies.
 """
+    #: Determines which validators should be used in the default
+    #: password forms and fields
+    PASSWORD_DEFAULT_VALIDATORS = [
+        'password_policies.forms.validators.validate_common_sequences',
+        'password_policies.forms.validators.validate_consecutive_count',
+        'password_policies.forms.validators.validate_cracklib',
+        'password_policies.forms.validators.validate_dictionary_words',
+        'password_policies.forms.validators.validate_letter_count',
+        'password_policies.forms.validators.validate_number_count',
+        'password_policies.forms.validators.validate_symbol_count',
+        'password_policies.forms.validators.validate_entropy',
+        'password_policies.forms.validators.validate_not_email',
+    ]
+
     #: Determines which fields should be searched upon
     #: in the admin change list of
     #: the :class:`~password_policies.models.PasswordChangeRequired`
