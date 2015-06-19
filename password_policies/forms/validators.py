@@ -10,6 +10,7 @@ from django.utils.encoding import smart_unicode
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
+from django.utils.module_loading import import_by_path
 
 from password_policies.conf import settings
 
@@ -548,6 +549,19 @@ Returns this validator's error message.
 """
         return settings.PASSWORD_MIN_SYMBOLS
 
+class DefaultValidator(object):
+    def __init__(self):
+        self.validators = map(import_by_path, settings.PASSWORD_DEFAULT_VALIDATORS)
+
+    def __call__(self, value):
+        errors = []
+        for validator in self.validators:
+            try:
+                validator(value)
+            except ValidationError as e:
+                errors.append(e)
+        if errors:
+            raise ValidationError(errors)
 
 validate_bidirectional = BidirectionalValidator()
 validate_common_sequences = CommonSequenceValidator(settings.PASSWORD_COMMON_SEQUENCES)
@@ -560,3 +574,4 @@ validate_letter_count = LetterCountValidator()
 validate_not_email = NotEmailValidator()
 validate_number_count = NumberCountValidator()
 validate_symbol_count = SymbolCountValidator()
+validate_default = DefaultValidator()
